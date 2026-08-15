@@ -1,6 +1,6 @@
-# Nourish
+# Fitmale 
 
-AI-powered women's adaptive wellness companion — cycle-aware, but personalized
+AI-powered women's adaptive wellness companion cycle-aware, but personalized
 to how you actually feel today, not a generic phase template.
 
 ## Stack
