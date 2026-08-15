@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap");
+
+body {
+  background-color: #FBF7F2;
+  color: #331F35;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl2 shadow-card p-6;
+  }
+  .btn-primary {
+    @apply bg-plum-700 text-white font-medium rounded-full px-6 py-3 transition hover:bg-plum-800 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply bg-white text-plum-700 font-medium rounded-full px-6 py-3 border border-plum-700/20 transition hover:border-plum-700/50;
+  }
+  .chip {
+    @apply px-4 py-2 rounded-full border text-sm font-medium transition cursor-pointer select-none;
+  }
+  .chip-inactive {
+    @apply bg-white border-plum-700/15 text-plum-700/70 hover:border-plum-700/40;
+  }
+  .chip-active {
+    @apply bg-lilac-400 border-lilac-400 text-white;
+  }
+  .label {
+    @apply block text-sm font-medium text-plum-700/80 mb-2;
+  }
+  .input-field {
+    @apply w-full rounded-xl border border-plum-700/15 px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-lilac-300;
+  }
+}

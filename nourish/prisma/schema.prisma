@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  ageRange      String
+  fitnessGoal   String
+  activityLevel String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  cycle           Cycle?
+  checkIns        DailyCheckIn[]
+  foodInventory   FoodInventoryItem[]
+  foodPreference  FoodPreference?
+  workoutRecs     WorkoutRecommendation[]
+  mealRecs        MealRecommendation[]
+  recoveryRecs    RecoveryRecommendation[]
+  feedback        Feedback[]
+  patterns        WellnessPattern[]
+  workoutPrefs    String? // JSON array as string
+}
+
+model Cycle {
+  id                String   @id @default(cuid())
+  user              User     @relation(fields: [userId], references: [id])
+  userId            String   @unique
+  lastPeriodStart   DateTime
+  averageCycleLength Int     @default(28)
+  periodDuration    Int      @default(5)
+  knowsCycleLength  Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model DailyCheckIn {
+  id              String   @id @default(cuid())
+  user            User     @relation(fields: [userId], references: [id])
+  userId          String
+  date            DateTime @default(now())
+  cycleDay        Int?
+  mood            Int
+  energy          Int
+  motivation      Int
+  stress          Int
+  sleepHours       Float
+  journal         String?
+  workoutTimeMins Int
+  feelsDifferent  String? // JSON: { category, description } or null
+
+  symptoms        Symptom[]
+  workoutRecs     WorkoutRecommendation[]
+  mealRecs        MealRecommendation[]
+  recoveryRecs    RecoveryRecommendation[]
+
+  createdAt       DateTime @default(now())
+}
+
+model Symptom {
+  id         String       @id @default(cuid())
+  checkIn    DailyCheckIn @relation(fields: [checkInId], references: [id])
+  checkInId  String
+  name       String
+}
+
+model FoodInventoryItem {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  category  String // carbohydrate | protein | vegetable | fruit | healthyFat
+  name      String
+  createdAt DateTime @default(now())
+}
+
+model FoodPreference {
+  id            String  @id @default(cuid())
+  user          User    @relation(fields: [userId], references: [id])
+  userId        String  @unique
+  style         String // nigerian | international | vegetarian | vegan | mixed
+  allergies     String? // comma-separated
+  dislikes      String? // comma-separated
+  restrictions  String?
+  budgetTier    String?
+  cookingTimeMins Int?
+}
+
+model WorkoutRecommendation {
+  id              String        @id @default(cuid())
+  user            User          @relation(fields: [userId], references: [id])
+  userId          String
+  checkIn         DailyCheckIn? @relation(fields: [checkInId], references: [id])
+  checkInId       String?
+  title           String
+  durationMinutes Int
+  intensity       String
+  reason          String
+  exercises       String // JSON array
+  createdAt       DateTime      @default(now())
+
+  feedback        Feedback[]
+}
+
+model MealRecommendation {
+  id                    String        @id @default(cuid())
+  user                  User          @relation(fields: [userId], references: [id])
+  userId                String
+  checkIn               DailyCheckIn? @relation(fields: [checkInId], references: [id])
+  checkInId             String?
+  name                  String
+  ingredients           String // JSON array
+  instructions          String // JSON array
+  estimatedTimeMinutes  Int
+  estimatedBudget       String
+  reason                String
+  createdAt             DateTime      @default(now())
+
+  feedback              Feedback[]
+}
+
+model RecoveryRecommendation {
+  id              String        @id @default(cuid())
+  user            User          @relation(fields: [userId], references: [id])
+  userId          String
+  checkIn         DailyCheckIn? @relation(fields: [checkInId], references: [id])
+  checkInId       String?
+  activity        String
+  durationMinutes Int
+  reason          String
+  createdAt       DateTime      @default(now())
+
+  feedback        Feedback[]
+}
+
+model Feedback {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  type         String // workout | meal | recovery
+  rating       String // loved_it | okay | too_difficult | too_easy | didnt_want_to | too_heavy | ...
+  note         String?
+  createdAt    DateTime @default(now())
+
+  workout      WorkoutRecommendation?  @relation(fields: [workoutId], references: [id])
+  workoutId    String?
+  meal         MealRecommendation?     @relation(fields: [mealId], references: [id])
+  mealId       String?
+  recovery     RecoveryRecommendation? @relation(fields: [recoveryId], references: [id])
+  recoveryId   String?
+}
+
+model WellnessPattern {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  category    String // energy | mood | motivation | sleep | meal | workout
+  description String
+  confidence  String // low | medium | high
+  createdAt   DateTime @default(now())
+}
